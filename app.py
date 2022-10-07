@@ -35,6 +35,9 @@ dataset = tf.keras.preprocessing.image_dataset_from_directory(
 class_names = dataset.class_names
 
 """### Build Web App Using Streamlit"""
+st.set_page_config(page_title ="Face Mask Detection", 
+                   page_icon=':mask:', 
+                   layout='centered')
 
 @st.cache(allow_output_mutation=True)
 def load_model():
