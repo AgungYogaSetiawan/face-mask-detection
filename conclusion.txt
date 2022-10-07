@@ -1,1 +1,0 @@
-berdasarkan pengamanatan dan percobaan, cahaya dan dekat jauhnya saat kita foto sangat memengaruhi hasil prediksi. menggunakan model.hdf5 (versi 1) dengan dataset gambar berjumlah 2136 dan 2 class (mask & no_mask). model tidak menggunakan dropout dan callback
