@@ -25,7 +25,7 @@ BATCH_SIZE = 32
 CHANNELS = 3
 
 dataset = tf.keras.preprocessing.image_dataset_from_directory(
-    './datasets2',
+    'datasets2',
     batch_size=BATCH_SIZE,
     image_size=(IMAGE_SIZE, IMAGE_SIZE),
     seed=123,
