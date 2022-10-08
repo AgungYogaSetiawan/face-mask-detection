@@ -16,6 +16,7 @@ import numpy as np
 import os
 import cv2
 import streamlit as st
+import snapshot as snap
 from PIL import Image
 from tensorflow.keras import models, layers
 from keras.models import load_model
@@ -25,7 +26,7 @@ BATCH_SIZE = 32
 CHANNELS = 3
 
 dataset = tf.keras.preprocessing.image_dataset_from_directory(
-    'datasets2',
+    './datasets2',
     batch_size=BATCH_SIZE,
     image_size=(IMAGE_SIZE, IMAGE_SIZE),
     seed=123,
@@ -35,9 +36,6 @@ dataset = tf.keras.preprocessing.image_dataset_from_directory(
 class_names = dataset.class_names
 
 """### Build Web App Using Streamlit"""
-st.set_page_config(page_title ="Face Mask Detection", 
-                   page_icon=':mask:', 
-                   layout='centered')
 
 @st.cache(allow_output_mutation=True)
 def load_model():
@@ -50,27 +48,54 @@ st.write("""
 """
 )
 
-camera_input = st.camera_input("Take a picture")
+# camera_input = st.camera_input("Take a picture")
 # st.set_option('deprecation.showfileUploaderEncoding', False)
 
+# function to predict image
 def take_and_predict(image, model):
-    
     # img_array = tf.keras.preprocessing.image.img_to_array(image)
     # img_array = tf.expand_dims(img_array, 0)
     predictions = model.predict(image)
     predicted_class = class_names[np.argmax(predictions[0])]
     score = round(100 * (np.max(predictions[0])), 2)
-          
+    
     return predicted_class, score
 
-if camera_input:
-    # To read image file buffer with OpenCV:
-    bytes_data = camera_input.getvalue()
-    cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    img = cv2.resize(cv2_img,(256,256))
-    img = np.reshape(img,[1,256,256,3])
-    predicted_class, score = take_and_predict(img, model)
-    st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
+# option selectbox
+option = st.selectbox(
+        'Please select photo input type',
+        ('Take photo', 'Upload photo'))
+
+if option == 'Take photo':
+    # In case Take photo is selected, run the webrtc component, 
+    # save photo and pass it to the object detection model
+    out_image = snap.streamlit_webrtc_snapshot()
+    
+    if out_image is not None:
+        st.image(out_image, channels="BGR")
+        img = cv2.resize(out_image, (256,256))
+        img = np.reshape(img, [1,256,256,3])
+        predicted_class, score = take_and_predict(img, model)
+        st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
+    else:
+        st.warning('Waiting for snapshot to be taken')
+
+elif option == 'Upload photo':
+    file = st.file_uploader("Please upload an file image", type=["jpg", "png", "jpeg"])
+    st.set_option('deprecation.showfileUploaderEncoding', False)
+        
+    if file is not None:
+        
+        # with open(os.path.join("tempDir",file.name),"wb") as f: 
+        #     f.write(file.getbuffer()) 
+        image = Image.open(file)
+        st.image(image, use_column_width=True)
+        img_array = tf.keras.preprocessing.image.img_to_array(image)
+        img_array = tf.expand_dims(img_array, 0)
+        predicted_class, score = take_and_predict(img_array, model)
+        st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
+        
 else:
-    st.text("Please take a photo")
+    st.warning('Please select the type of photo you would like to classify.')
+
 
