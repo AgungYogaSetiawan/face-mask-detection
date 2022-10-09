@@ -94,7 +94,7 @@ if option == 'Take photo':
         img = cv2.resize(out_image, (256,256)) # resizing image
         img = np.reshape(img, [1,256,256,3]) # reshape image to easy to predict same like train image
         # file_name = write_image(img) # write image to folder tempDir
-        predicted_class, score = take_and_predict(img_array, model) # results
+        predicted_class, score = take_and_predict(img, model) # results
         st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
     else:
         st.warning('Waiting for snapshot to be taken')
