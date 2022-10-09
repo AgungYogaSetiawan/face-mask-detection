@@ -91,10 +91,8 @@ if option == 'Take photo':
     
     if out_image is not None:
         st.image(out_image, channels="BGR") # display image
-        # img = cv2.resize(out_image, (256,256)) # resizing image
-        # img = np.reshape(img, [1,256,256,3]) # reshape image to easy to predict same like train image
-        img_array = tf.keras.preprocessing.image.img_to_array(out_image)
-        img_array = tf.expand_dims(img_array, 0)
+        img = cv2.resize(out_image, (256,256)) # resizing image
+        img = np.reshape(img, [1,256,256,3]) # reshape image to easy to predict same like train image
         # file_name = write_image(img) # write image to folder tempDir
         predicted_class, score = take_and_predict(img_array, model) # results
         st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
