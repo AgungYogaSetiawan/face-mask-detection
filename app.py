@@ -16,6 +16,9 @@ import numpy as np
 import os
 import cv2
 import streamlit as st
+import snapshot as snap
+import time 
+from datetime import date
 from PIL import Image
 from tensorflow.keras import models, layers
 from keras.models import load_model
@@ -33,41 +36,87 @@ dataset = tf.keras.preprocessing.image_dataset_from_directory(
 )
 
 class_names = dataset.class_names
-
+st.set_page_config(page_title='Face Mask Detection Web App with Streamlit',layout='wide', page_icon=":mask:")
 """### Build Web App Using Streamlit"""
+# page layout menjadi wide
 
+# function to load model
 @st.cache(allow_output_mutation=True)
 def load_model():
-  model=tf.keras.models.load_model('model.hdf5')
-  return model
-model=load_model()
+    model=tf.keras.models.load_model('model_V4.hdf5')
+    return model
+
+model = load_model()
 
 st.write("""
-# Face Mask Detection Web App with Streamlit
+# :mask: Face Mask Detection Web App with Streamlit
 """
 )
 
-camera_input = st.camera_input("Take a picture")
-# st.set_option('deprecation.showfileUploaderEncoding', False)
-
+# function to predict image
 def take_and_predict(image, model):
-    
-    # img_array = tf.keras.preprocessing.image.img_to_array(image)
-    # img_array = tf.expand_dims(img_array, 0)
     predictions = model.predict(image)
     predicted_class = class_names[np.argmax(predictions[0])]
     score = round(100 * (np.max(predictions[0])), 2)
-          
+    
     return predicted_class, score
 
-if camera_input:
-    # To read image file buffer with OpenCV:
-    bytes_data = camera_input.getvalue()
-    cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    img = cv2.resize(cv2_img,(256,256))
-    img = np.reshape(img,[1,256,256,3])
-    predicted_class, score = take_and_predict(img, model)
-    st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
+# function to write image to folder tempDir with unique name
+def write_image(out_image):
+    '''
+    Write image to tempDir folder with a unique name
+    '''
+    
+    today = date.today()
+    d = today.strftime("%b-%d-%Y")
+    
+    t = time.localtime()
+    current_time = time.strftime("%H-%M-%S", t)
+    
+    file_name = "tempDir/photo_" + d + "_" + current_time + ".jpg"
+    
+    cv2.imwrite(file_name, out_image)
+    
+    return(file_name)
+
+# option selectbox
+option = st.selectbox(
+        'Please select photo input type',
+        ('Take photo', 'Upload photo'))
+
+if option == 'Take photo':
+    # In case Take photo is selected, run the webrtc component, 
+    # save photo and pass it to the object detection model
+    out_image = snap.streamlit_webrtc_snapshot()
+    
+    if out_image is not None:
+        st.image(out_image, channels="BGR") # display image
+        # img = cv2.resize(out_image, (256,256)) # resizing image
+        # img = np.reshape(img, [1,256,256,3]) # reshape image to easy to predict same like train image
+        img_array = tf.keras.preprocessing.image.img_to_array(out_image)
+        img_array = tf.expand_dims(img_array, 0)
+        # file_name = write_image(img) # write image to folder tempDir
+        predicted_class, score = take_and_predict(img_array, model) # results
+        st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
+    else:
+        st.warning('Waiting for snapshot to be taken')
+
+elif option == 'Upload photo':
+    file = st.file_uploader("Please upload an file image", type=["jpg", "png", "jpeg"])
+    st.set_option('deprecation.showfileUploaderEncoding', False)
+        
+    if file is not None:
+        
+        # with open(os.path.join("tempDir",file.name),"wb") as f: 
+        #     f.write(file.getbuffer()) # write image to folder tempDir
+        image = Image.open(file)
+        st.image(image, use_column_width=True)
+        img_array = tf.keras.preprocessing.image.img_to_array(image)
+        img_array = tf.expand_dims(img_array, 0)
+        predicted_class, score = take_and_predict(img_array, model)
+        st.write(f'This image most likely belongs to {predicted_class} with a {score} % confidence.')
+        
 else:
-    st.text("Please take a photo")
+    st.warning('Please select the type of photo you would like to classify.')
+
 
