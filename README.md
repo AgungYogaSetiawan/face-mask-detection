@@ -28,8 +28,15 @@ streamlit run app.py
 
 there is some influence in the model can predict from an image, then the model can make mistakes in predicting
 
-- ![light and distance](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02.png)
-- ![without light and far away](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(1).png)
-- ![light and close](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(2).png)
-- ![without light and close](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(4).png)
+- light and distance
+![light and distance](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02.png)
+
+- without light and far away
+![without light and far away](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(1).png)
+
+- light and close
+![light and close](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(2).png)
+
+- without light and close
+![without light and close](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(4).png)
 
