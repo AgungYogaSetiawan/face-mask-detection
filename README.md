@@ -40,3 +40,10 @@ there is some influence in the model can predict from an image, then the model c
 - without light and close
 ![without light and close](https://github.com/AgungYogaSetiawan/assets-image-and-videos-for-readme/blob/main/2022-10-02%20(4).png)
 
+
+
+## Acknowledgements
+
+- [Awesome Repository](https://github.com/soft-nougat/streamlitwebcam)
+- [Streamlit WebRTC](https://github.com/whitphx/streamlit-webrtc)
+
